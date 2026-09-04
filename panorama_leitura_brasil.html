@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panorama da Leitura no Brasil - Dados e Estatísticas</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-main: #FAF8F5;
+            --bg-card: #FFFFFF;
+            --text-dark: #2C3E35;
+            --text-muted: #66706A;
+            --primary-sage: #4A6B5D;
+            --primary-sage-dark: #2D4A3E;
+            --primary-sage-light: #EBF0ED;
+            --accent-terracotta: #D98A6C;
+            --accent-terracotta-light: #FBF0EC;
+            --accent-blue: #6B8E9B;
+            --accent-blue-light: #EEF4F6;
+            --border-color: #E6E1DA;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            --shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.08);
+            --radius-lg: 20px;
+            --radius-md: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 60px;
+        }
+
+        h1, h2, h3, .font-heading {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header / Hero */
+        header {
+            background: linear-gradient(135deg, var(--primary-sage-dark) 0%, var(--primary-sage) 100%);
+            color: #FFFFFF;
+            padding: 60px 0 80px;
+            border-bottom-left-radius: 32px;
+            border-bottom-right-radius: 32px;
+            margin-bottom: -40px;
+            position: relative;
+        }
+
+        .header-content {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            line-height: 1.2;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.88);
+            max-width: 540px;
+        }
+
+        .hero-image-wrapper {
+            position: relative;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            height: 280px;
+        }
+
+        .hero-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* KPI Cards Grid */
+        .kpi-section {
+            margin-bottom: 48px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .kpi-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .kpi-icon.green { background: var(--primary-sage-light); color: var(--primary-sage-dark); }
+        .kpi-icon.orange { background: var(--accent-terracotta-light); color: var(--accent-terracotta); }
+        .kpi-icon.blue { background: var(--accent-blue-light); color: var(--accent-blue); }
+
+        .kpi-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .kpi-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .kpi-subtext {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Layout Main Sections */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            margin-bottom: 36px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1.35rem;
+            color: var(--primary-sage-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2.5;
+        }
+
+        /* Charts styling */
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+
+        /* Tables */
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .custom-table th {
+            text-align: left;
+            padding: 12px 14px;
+            background-color: var(--primary-sage-light);
+            color: var(--primary-sage-dark);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .custom-table th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+        .custom-table th:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+
+        .custom-table td {
+            padding: 14px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.92rem;
+            color: var(--text-dark);
+        }
+
+        .custom-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-red { background: #FDE8E8; color: #E02424; }
+        .badge-green { background: #EDFDF5; color: #0E9F6E; }
+        .badge-orange { background: #FEF3C7; color: #D97706; }
+
+        /* Feature Highlight Card */
+        .highlight-card {
+            background: linear-gradient(135deg, #FFF9F5 0%, #FAF0E6 100%);
+            border: 1px solid #F3DEC9;
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            margin-bottom: 36px;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 28px;
+            align-items: center;
+        }
+
+        .highlight-content h2 {
+            font-size: 1.8rem;
+            color: var(--primary-sage-dark);
+            margin-bottom: 12px;
+        }
+
+        .highlight-list {
+            list-style: none;
+            margin-top: 16px;
+        }
+
+        .highlight-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .highlight-list li i {
+            color: var(--accent-terracotta);
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+
+        .highlight-img {
+            width: 100%;
+            height: 240px;
+            border-radius: var(--radius-md);
+            object-fit: cover;
+            box-shadow: var(--shadow);
+        }
+
+        /* Banner Callout */
+        .callout-box {
+            background-color: var(--primary-sage-light);
+            border-left: 5px solid var(--primary-sage);
+            padding: 20px 24px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            margin-top: 20px;
+        }
+
+        .callout-box p {
+            font-size: 0.95rem;
+            color: var(--primary-sage-dark);
+            font-weight: 500;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0 20px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .header-content, .grid-2, .highlight-card {
+                grid-template-columns: 1fr;
+            }
+            .hero-image-wrapper {
+                height: 200px;
+            }
+            header h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div>
+                    <div class="badge">
+                        <i data-lucide="book-open" style="width:14px; height:14px;"></i> Relatório Especial
+                    </div>
+                    <h1>Panorama da Leitura & Consumo no Brasil</h1>
+                    <p>Um estudo detalhado e acessível sobre os hábitos leitores da população brasileira, novos perfis demográficos e o crescimento do mercado editorial.</p>
+                </div>
+                <div class="hero-image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=800&q=80" alt="Livros empilhados numa biblioteca aconchegante">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- KPI Cards Section -->
+        <section class="kpi-section">
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div>
+                        <div class="kpi-icon green">
+                            <i data-lucide="book-marked"></i>
+                        </div>
+                        <div class="kpi-value">5,0</div>
+                        <div class="kpi-label">Livros lidos por ano</div>
+                        <div class="kpi-subtext">2 inteiros e 3 lidos em partes (Média nacional)</div>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div>
+                        <div class="kpi-icon orange">
+                            <i data-lucide="pie-chart"></i>
+                        </div>
+                        <div class="kpi-value">47%</div>
+                        <div class="kpi-label">População leitora</div>
+                        <div class="kpi-subtext">Com queda de -6,7M em comparação a 2019</div>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div>
+                        <div class="kpi-icon blue">
+                            <i data-lucide="shopping-bag"></i>
+                        </div>
+                        <div class="kpi-value">+3 Mi</div>
+                        <div class="kpi-label">Novos compradores</div>
+                        <div class="kpi-subtext">Crescimento impulsionado pelo público jovem</div>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div>
+                        <div class="kpi-icon green">
+                            <i data-lucide="users"></i>
+                        </div>
+                        <div class="kpi-value">61%</div>
+                        <div class="kpi-label">Público feminino</div>
+                        <div class="kpi-subtext">Mulheres lideram o consumo de livros no Brasil</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 1: Hábitos de Leitura -->
+        <section class="grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i data-lucide="pie-chart"></i> Proporção Leitores vs. Não Leitores</h2>
+                </div>
+                <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:15px;">
+                    Considera-se "leitor" quem leu pelo menos 1 livro (ou partes dele) nos últimos 3 meses (Pesquisa Retratos da Leitura).
+                </p>
+                <div class="chart-container">
+                    <canvas id="readersChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i data-lucide="bar-chart-2"></i> Média de Leitura Anual</h2>
+                </div>
+                <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:15px;">
+                    Detalhamento de como se dividem os 5 livros lidos anualmente pela média dos brasileiros.
+                </p>
+                <div class="chart-container">
+                    <canvas id="booksChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Tabela de Dados Consolidados -->
+        <section class="card" style="margin-bottom: 36px;">
+            <div class="card-header">
+                <h2 class="card-title"><i data-lucide="file-text"></i> Dados Consolidados das Pesquisas Recentes</h2>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Indicador / Categoria</th>
+                            <th>Métrica / Porcentagem</th>
+                            <th>Volume / Pessoas</th>
+                            <th>Status / Tendência</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Não Leitores (2024)</strong></td>
+                            <td>53% da população</td>
+                            <td>~100+ milhões</td>
+                            <td><span class="badge-status badge-red">Desafio Histórico</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Leitores Ativos (2024)</strong></td>
+                            <td>47% da população</td>
+                            <td>~93 milhões</td>
+                            <td><span class="badge-status badge-orange">Queda de 6.7M leitores</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Compradores de Livros (>18 anos)</strong></td>
+                            <td>18% da população adulta</td>
+                            <td>+3 milhões novos em 1 ano</td>
+                            <td><span class="badge-status badge-green">Em Crescimento</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Engajamento Jovem (18-34 anos)</strong></td>
+                            <td>Aumento de +3,4 p.p.</td>
+                            <td>Impulsionado por redes (BookTok)</td>
+                            <td><span class="badge-status badge-green">Tendência Alta</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="callout-box">
+                <p>💡 <strong>Nota Explicativa:</strong> Existe um contraste marcante entre o número de leitores frequentes (que diminuiu) e o volume de compradores de livros (que aumentou). O hábito de leitura se concentrou em um público comprador mais jovem e altamente engajado.</p>
+            </div>
+        </section>
+
+        <!-- Section 3: Perfil Demográfico -->
+        <section class="highlight-card">
+            <div class="highlight-content">
+                <h2>O Novo Perfil do Consumidor de Livros</h2>
+                <p style="color:var(--text-muted); font-size:0.95rem;">
+                    Os dados mais recentes da pesquisa <em>Panorama do Consumo de Livros</em> romperam antigos estereótipos do mercado editorial brasileiro:
+                </p>
+                <ul class="highlight-list">
+                    <li>
+                        <i data-lucide="check-circle-2"></i>
+                        <span><strong>Protagonismo Feminino:</strong> As mulheres são responsáveis por <strong>61%</strong> das compras de livros no país.</span>
+                    </li>
+                    <li>
+                        <i data-lucide="check-circle-2"></i>
+                        <span><strong>Diversidade Étnica:</strong> Pessoas pretas e pardas juntas representam <strong>49%</strong> dos compradores.</span>
+                    </li>
+                    <li>
+                        <i data-lucide="check-circle-2"></i>
+                        <span><strong>Maior Grupo Consumidor:</strong> Mulheres negras da <strong>Classe C</strong> assumiram a liderança no volume total de compra de livros no Brasil.</span>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80" alt="Mulher lendo um livro com atenção" class="highlight-img">
+            </div>
+        </section>
+
+        <!-- Section 4: Charts Perfil Demográfico -->
+        <section class="grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i data-lucide="user-check"></i> Distribuição por Gênero</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="genderChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i data-lucide="users"></i> Composição por Raça/Etnia</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="ethnicityChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Fonte dos dados: Pesquisa Retratos da Leitura no Brasil & Panorama do Consumo de Livros.</p>
+            <p style="margin-top:6px;">Desenvolvido como relatório digital interativo.</p>
+        </div>
+    </footer>
+
+    <!-- Chart Configuration Script -->
+    <script>
+        // Inicializar ícones Lucide
+        lucide.createIcons();
+
+        // Configuração global do Chart.js
+        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+        Chart.defaults.color = '#66706A';
+
+        // 1. Chart: Leitores vs Não Leitores
+        const ctxReaders = document.getElementById('readersChart').getContext('2d');
+        new Chart(ctxReaders, {
+            type: 'doughnut',
+            data: {
+                labels: ['Não Leitores', 'Leitores Ativos'],
+                datasets: [{
+                    data: [53, 47],
+                    backgroundColor: ['#D98A6C', '#4A6B5D'],
+                    borderWidth: 3,
+                    borderColor: '#FFFFFF'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) { return context.label + ': ' + context.raw + '%'; }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 2. Chart: Composição dos Livros Lidos
+        const ctxBooks = document.getElementById('booksChart').getContext('2d');
+        new Chart(ctxBooks, {
+            type: 'bar',
+            data: {
+                labels: ['Livros Lidos Por Ano'],
+                datasets: [
+                    {
+                        label: 'Lidos Inteiros',
+                        data: [2],
+                        backgroundColor: '#4A6B5D',
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Lidos em Partes',
+                        data: [3],
+                        backgroundColor: '#6B8E9B',
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, max: 6, title: { display: true, text: 'Quantidade de Livros' } }
+                },
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // 3. Chart: Distribuição por Gênero
+        const ctxGender = document.getElementById('genderChart').getContext('2d');
+        new Chart(ctxGender, {
+            type: 'pie',
+            data: {
+                labels: ['Mulheres', 'Homens'],
+                datasets: [{
+                    data: [61, 39],
+                    backgroundColor: ['#4A6B5D', '#E6E1DA'],
+                    borderWidth: 2,
+                    borderColor: '#FFFFFF'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // 4. Chart: Composição por Etnia
+        const ctxEthnicity = document.getElementById('ethnicityChart').getContext('2d');
+        new Chart(ctxEthnicity, {
+            type: 'bar',
+            data: {
+                labels: ['Pretos e Pardos', 'Outros Grupos'],
+                datasets: [{
+                    label: 'Representação (%)',
+                    data: [49, 51],
+                    backgroundColor: ['#D98A6C', '#6B8E9B'],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                scales: {
+                    x: { max: 100, ticks: { callback: v => v + '%' } }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
